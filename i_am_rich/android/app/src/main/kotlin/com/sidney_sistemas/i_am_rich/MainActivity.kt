@@ -1,4 +1,4 @@
-package com.example.i_am_rich
+package com.sidney_sistemas.i_am_rich
 
 import io.flutter.embedding.android.FlutterActivity
 
