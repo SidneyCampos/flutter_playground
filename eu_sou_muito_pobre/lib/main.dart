@@ -17,6 +17,7 @@ class _MeuAppState extends State<MeuApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Colors.black,
         appBar: AppBar(
@@ -24,19 +25,23 @@ class _MeuAppState extends State<MeuApp> {
           centerTitle: true,
           title: Text("Eu sou muito Pobre"),
         ),
-        body: SafeArea(
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Image(
-              image: NetworkImage(
-                  "https://media.giphy.com/media/9BaedF2O7dGlexHmjS/giphy.gif"),
-              filterQuality: FilterQuality.high,
-              //width: double.infinity,
-              //height: double.infinity,
+        body: Column(
+          //mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Image(
+                image: NetworkImage(
+                    "https://media.giphy.com/media/9BaedF2O7dGlexHmjS/giphy.gif"),
+                filterQuality: FilterQuality.high,
+                width: double.infinity,
+                height: double.infinity,
+              ),
             ),
             AdmobBanner(
-                adUnitId: AdmobBanner.testAdUnitId,
-                adSize: AdmobBannerSize.FULL_BANNER),
-          ]),
+              adUnitId: AdmobBanner.testAdUnitId,
+              adSize: AdmobBannerSize.BANNER,
+            )
+          ],
         ),
       ),
     );

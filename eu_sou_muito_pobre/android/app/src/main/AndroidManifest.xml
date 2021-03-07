@@ -1,9 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.sidney_sistemas.eu_sou_muito_pobre">
+    <uses-permission android:name="android.permission.INTERNET"/>
    <application
+
         android:label="Eu sou muito pobre"
         android:icon="@mipmap/ic_launcher">
         <activity
+
             android:name=".MainActivity"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
