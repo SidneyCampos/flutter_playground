@@ -38,7 +38,7 @@ class _MeuAppState extends State<MeuApp> {
               ),
             ),
             AdmobBanner(
-              adUnitId: AdmobBanner.testAdUnitId,
+              adUnitId: 'ca-app-pub-5264260497889367/5524474986',
               adSize: AdmobBannerSize.BANNER,
             )
           ],
