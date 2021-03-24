@@ -1,18 +1,19 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.sidneysistemas.meu_cartao_pessoal">
+    package="com.sidneysistemas.ez_gaz">
     <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="meu_cartao_pessoal"
+        android:label="ez_gaz"
         android:icon="@mipmap/ic_launcher">
+       <meta-data android:name="com.google.android.geo.API_KEY"
+           android:value="AIzaSyA-aBMRUYH6hV7p0_OUcw1nPtMDkwVboa4"/>
         <activity
             android:name=".MainActivity"
+            android:screenOrientation="portrait"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
-            android:windowSoftInputMode="adjustResize"
-            android:requestLegacyExternalStorage="true"
-            >
+            android:windowSoftInputMode="adjustResize">
             <!-- Specifies an Android theme to apply to this Activity as soon as
                  the Android process has started. This theme is visible to the user
                  while the Flutter UI initializes. After that, this theme continues
@@ -40,11 +41,7 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-       <meta-data
-           android:name="com.google.android.gms.ads.APPLICATION_ID"
-           android:value="ca-app-pub-5264260497889367~4979960754"/>
+
 
     </application>
-
-
 </manifest>

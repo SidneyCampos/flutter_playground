@@ -33,6 +33,8 @@ dependencies:
   screenshot: ^0.2.0
   share: ^2.0.1
   path_provider: ^1.1.0
+  admob_flutter: ^1.0.1
+  flutter_admob_app_open: ^1.0.3
 
 dev_dependencies:
   flutter_test:

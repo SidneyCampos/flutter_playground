@@ -1,16 +1,41 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:admob_flutter/admob_flutter.dart';
 import 'package:circular_profile_avatar/circular_profile_avatar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_admob_app_open/flutter_admob_app_open.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share/share.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  /// Replace your admob app ID
+  final admobAppId = 'ca-app-pub-5264260497889367~4979960754';
+
+  /// Replace your admob app open ad unit id
+  final appAppOpenAdUnitId = FlutterAdmobAppOpen.testAppOpenAdId;
+
+  AdRequestAppOpen targetingInfo = AdRequestAppOpen(
+    keywords: <String>['flutterio', 'beautiful apps'],
+    contentUrl: 'https://flutter.io',
+    testDevices: <String>[], // Android emulators are considered test devices
+    nonPersonalizedAds: true,
+  );
+
+  await FlutterAdmobAppOpen.instance.initialize(
+    appId: admobAppId,
+    appAppOpenAdUnitId: appAppOpenAdUnitId,
+    targetingInfo: targetingInfo,
+  );
+
+  Admob.initialize();
+
   runApp(MyApp());
 }
 
@@ -226,7 +251,21 @@ class _MyAppState extends State<MyApp> {
                             ),
                           ),
                         ],
-                      )
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(height: 20),
+                          Align(
+                            alignment: Alignment.bottomCenter,
+                            child: AdmobBanner(
+                              adUnitId:
+                                  'ca-app-pub-5264260497889367/5573721656',
+                              adSize: AdmobBannerSize.FULL_BANNER,
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
