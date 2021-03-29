@@ -2,7 +2,7 @@
     package="com.sidneysistemas.meu_cartao_pessoal">
     <uses-permission android:name="android.permission.INTERNET"/>
    <application
-        android:label="meu_cartao_pessoal"
+        android:label="Meu Cartão Profissional"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

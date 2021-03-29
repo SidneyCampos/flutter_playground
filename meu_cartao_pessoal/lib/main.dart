@@ -15,8 +15,10 @@ import 'package:share/share.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  //Admob.initialize();
+
   /// Replace your admob app ID
-  final admobAppId = 'ca-app-pub-5264260497889367~4979960754';
+  final admobAppId = FlutterAdmobAppOpen.testAppId;
 
   /// Replace your admob app open ad unit id
   final appAppOpenAdUnitId = FlutterAdmobAppOpen.testAppOpenAdId;
@@ -34,8 +36,6 @@ Future<void> main() async {
     targetingInfo: targetingInfo,
   );
 
-  Admob.initialize();
-
   runApp(MyApp());
 }
 
@@ -45,6 +45,11 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   final picker = ImagePicker();
   File profileImage;
   String profileImageChange = 'images/helena.jpg';
@@ -109,7 +114,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _takeScreenshot() async {
-    final imageFile = await _screenshotController.capture(pixelRatio: 2.0);
+    final imageFile = await _screenshotController.capture(pixelRatio: 3.0);
 
     Share.shareFiles([imageFile.path]);
 
@@ -259,8 +264,8 @@ class _MyAppState extends State<MyApp> {
                           Align(
                             alignment: Alignment.bottomCenter,
                             child: AdmobBanner(
-                              adUnitId:
-                                  'ca-app-pub-5264260497889367/5573721656',
+                              adUnitId: AdmobBanner
+                                  .testAdUnitId, //'ca-app-pub-5264260497889367/5573721656',
                               adSize: AdmobBannerSize.FULL_BANNER,
                             ),
                           ),
