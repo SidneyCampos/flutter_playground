@@ -1,42 +1,30 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:admob_flutter/admob_flutter.dart';
+//import 'package:admob_flutter/admob_flutter.dart';
 import 'package:circular_profile_avatar/circular_profile_avatar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_admob_app_open/flutter_admob_app_open.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share/share.dart';
+
+import 'ad_state.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  //Admob.initialize();
+  final initFuture = MobileAds.instance.initialize();
+  final adState = AdState(initFuture);
 
-  /// Replace your admob app ID
-  final admobAppId = FlutterAdmobAppOpen.testAppId;
-
-  /// Replace your admob app open ad unit id
-  final appAppOpenAdUnitId = FlutterAdmobAppOpen.testAppOpenAdId;
-
-  AdRequestAppOpen targetingInfo = AdRequestAppOpen(
-    keywords: <String>['flutterio', 'beautiful apps'],
-    contentUrl: 'https://flutter.io',
-    testDevices: <String>[], // Android emulators are considered test devices
-    nonPersonalizedAds: true,
-  );
-
-  await FlutterAdmobAppOpen.instance.initialize(
-    appId: admobAppId,
-    appAppOpenAdUnitId: appAppOpenAdUnitId,
-    targetingInfo: targetingInfo,
-  );
-
-  runApp(MyApp());
+  runApp(Provider.value(
+    value: adState,
+    builder: (context, child) => MyApp(),
+  ));
 }
 
 class MyApp extends StatefulWidget {
@@ -45,18 +33,50 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  BannerAd banner;
+  InterstitialAd inter;
+
   @override
   void initState() {
+    // TODO: implement initState
     super.initState();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final adState = Provider.of<AdState>(context);
+    adState.initialization.then((status) {
+      setState(() {
+        banner = BannerAd(
+            adUnitId: BannerAd
+                .testAdUnitId, //'ca-app-pub-5264260497889367/5573721656',
+            size: AdSize.banner,
+            request: AdRequest(),
+            listener: adState.adListener)
+          ..load();
+
+        inter = InterstitialAd(
+            adUnitId: InterstitialAd
+                .testAdUnitId, //'ca-app-pub-5264260497889367/2511077066',
+            listener: adState.adListener,
+            request: AdRequest())
+          ..load();
+      });
+    });
+  }
+
+  // AppOpenAd appOpenAd = AppOpenAd(timeout: Duration(minutes: 30))
+  //   ..load(unitId: 'ca-app-pub-3940256099942544/3419835294');
+
   final picker = ImagePicker();
   File profileImage;
-  String profileImageChange = 'images/helena.jpg';
+
   TextEditingController myControllerNome = TextEditingController();
   TextEditingController myControllerProfissao = TextEditingController();
   TextEditingController myControllerTelefone = TextEditingController();
   TextEditingController myControllerEmail = TextEditingController();
+  String profileImageChange = 'images/helena.jpg';
   String name = 'Helena Moraes';
   String profissao = 'BIÓLOGA';
   String telefone = '+55 31 9453-4365';
@@ -104,7 +124,10 @@ class _MyAppState extends State<MyApp> {
     profissao = 'Profissão';
     telefone = 'Telefone';
     email = 'Email';
-    setState(() {});
+
+    setState(() {
+      print('aquiii');
+    });
   }
 
   void cores([int shade = 600]) {
@@ -115,6 +138,10 @@ class _MyAppState extends State<MyApp> {
 
   void _takeScreenshot() async {
     final imageFile = await _screenshotController.capture(pixelRatio: 3.0);
+
+    setState(() {
+      inter.show();
+    });
 
     Share.shareFiles([imageFile.path]);
 
@@ -127,11 +154,6 @@ class _MyAppState extends State<MyApp> {
         debugShowCheckedModeBanner: false,
         home: Scaffold(
             backgroundColor: Colors.transparent,
-            // appBar: AppBar(
-            //   backgroundColor: Colors.teal[900],
-            //   centerTitle: true,
-            //   title: Text("Meu cartão pessoal"),
-            // ),
             body: SafeArea(
               child: Center(
                 child: Container(
@@ -257,20 +279,15 @@ class _MyAppState extends State<MyApp> {
                           ),
                         ],
                       ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(height: 20),
-                          Align(
-                            alignment: Alignment.bottomCenter,
-                            child: AdmobBanner(
-                              adUnitId: AdmobBanner
-                                  .testAdUnitId, //'ca-app-pub-5264260497889367/5573721656',
-                              adSize: AdmobBannerSize.FULL_BANNER,
-                            ),
-                          ),
-                        ],
+                      SizedBox(
+                        height: 20,
                       ),
+                      if (banner == null)
+                        SizedBox(
+                          height: 50,
+                        )
+                      else
+                        Container(height: 50, child: AdWidget(ad: banner)),
                     ],
                   ),
                 ),
