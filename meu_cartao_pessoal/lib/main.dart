@@ -1,14 +1,15 @@
 import 'dart:io';
 import 'dart:math';
 
-//import 'package:admob_flutter/admob_flutter.dart';
 import 'package:circular_profile_avatar/circular_profile_avatar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:meu_cartao_pessoal/mascaras.dart';
 import 'package:provider/provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:share/share.dart';
@@ -20,11 +21,9 @@ Future<void> main() async {
 
   final initFuture = MobileAds.instance.initialize();
   final adState = AdState(initFuture);
-
-  runApp(Provider.value(
-    value: adState,
-    builder: (context, child) => MyApp(),
-  ));
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]).then(
+      (value) => runApp(Provider.value(
+          value: adState, builder: (context, child) => MyApp())));
 }
 
 class MyApp extends StatefulWidget {
@@ -35,39 +34,11 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   BannerAd banner;
   InterstitialAd inter;
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final adState = Provider.of<AdState>(context);
-    adState.initialization.then((status) {
-      setState(() {
-        banner = BannerAd(
-            adUnitId: BannerAd
-                .testAdUnitId, //'ca-app-pub-5264260497889367/5573721656',
-            size: AdSize.banner,
-            request: AdRequest(),
-            listener: adState.adListener)
-          ..load();
-
-        inter = InterstitialAd(
-            adUnitId: InterstitialAd
-                .testAdUnitId, //'ca-app-pub-5264260497889367/2511077066',
-            listener: adState.adListener,
-            request: AdRequest())
-          ..load();
-      });
-    });
-  }
-
-  // AppOpenAd appOpenAd = AppOpenAd(timeout: Duration(minutes: 30))
-  //   ..load(unitId: 'ca-app-pub-3940256099942544/3419835294');
+  final _formKey = GlobalKey<FormState>();
+  final _telefone = TextEditingController(text: '(37) 99985-7854');
+  final _email = TextEditingController(text: 'HelenaMoraes.84@gmail.com');
+  final _nome = TextEditingController(text: 'Helena Moraes');
+  final _profissao = TextEditingController(text: 'BIÓLOGA');
 
   final picker = ImagePicker();
   File profileImage;
@@ -77,13 +48,31 @@ class _MyAppState extends State<MyApp> {
   TextEditingController myControllerTelefone = TextEditingController();
   TextEditingController myControllerEmail = TextEditingController();
   String profileImageChange = 'images/helena.jpg';
-  String name = 'Helena Moraes';
-  String profissao = 'BIÓLOGA';
-  String telefone = '+55 31 9453-4365';
-  String email = 'helena.84@gmail.com';
   Color cor = Colors.teal;
   Color cor300 = Colors.teal[300];
-  //TESTES SCREENSHOTS
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final adState = Provider.of<AdState>(context);
+    adState.initialization.then((status) {
+      setState(() {
+        banner = BannerAd(
+            adUnitId: 'ca-app-pub-5264260497889367/5573721656',
+            size: AdSize.banner,
+            request: AdRequest(),
+            listener: adState.adListener)
+          ..load();
+
+        inter = InterstitialAd(
+            adUnitId: 'ca-app-pub-5264260497889367/2511077066',
+            listener: adState.adListener,
+            request: AdRequest())
+          ..load();
+      });
+    });
+  }
+
   final _screenshotController = ScreenshotController();
 
   Image setProfileImage(String nameImage) {
@@ -98,6 +87,7 @@ class _MyAppState extends State<MyApp> {
 
   TextEditingController setInputDataProfissao(String text) {
     myControllerProfissao.text = text;
+    print(myControllerProfissao.text);
     return myControllerProfissao;
   }
 
@@ -120,178 +110,289 @@ class _MyAppState extends State<MyApp> {
 
   void newData() {
     profileImageChange = 'images/user.png';
-    name = 'Nome';
-    profissao = 'Profissão';
-    telefone = 'Telefone';
-    email = 'Email';
-
-    setState(() {
-      print('aquiii');
-    });
+    _telefone.clear();
+    _email.clear();
+    _nome.clear();
+    _profissao.clear();
+    setState(() {});
   }
 
-  void cores([int shade = 600]) {
-    cor = Colors.primaries[Random().nextInt(Colors.primaries.length)][shade];
+  void cores() {
+    cor = Colors.primaries[Random().nextInt(Colors.primaries.length)];
     cor300 = Colors.primaries[Random().nextInt(Colors.primaries.length)][300];
+    print('aquiii');
     setState(() {});
   }
 
   void _takeScreenshot() async {
     final imageFile = await _screenshotController.capture(pixelRatio: 3.0);
 
+    Share.shareFiles([imageFile.path]);
+
     setState(() {
       inter.show();
     });
-
-    Share.shareFiles([imageFile.path]);
-
-    //opacityButton(1);
   }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(
-            backgroundColor: Colors.transparent,
-            body: SafeArea(
-              child: Center(
-                child: Container(
-                  color: cor,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Screenshot(
-                        controller: _screenshotController,
-                        child: Container(
-                          color: cor,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              TextButton(
-                                onPressed: getText,
-                                child: CircularProfileAvatar(
-                                  '',
-                                  child: setProfileImage(profileImageChange),
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: Colors.transparent,
+        body: SafeArea(
+          child: Container(
+            child: Center(
+              child: Container(
+                color: cor,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Screenshot(
+                      controller: _screenshotController,
+                      child: Container(
+                        color: cor,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            TextButton(
+                              onPressed: getText,
+                              child: CircularProfileAvatar(
+                                '',
+                                child: setProfileImage(profileImageChange),
+                              ),
+                            ),
+                            Form(
+                              // É AQUI --------------------------------
+                              child: TextField(
+                                onTap: () {
+                                  setState(() {
+                                    _nome.clear();
+                                  });
+                                },
+                                textAlign: TextAlign.center,
+                                cursorColor: cor300,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: 'DancingScript',
+                                  fontSize: 40,
+                                ),
+                                controller: _nome,
+                                textInputAction: TextInputAction.done,
+                                keyboardType: TextInputType.name,
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  contentPadding: EdgeInsets.only(
+                                    right: 40,
+                                  ), // add padding to adjust text
+                                  isDense: true,
+                                  hintText: "Nome",
+                                  hintStyle: TextStyle(color: Colors.black26),
+
+                                  prefixIcon: Padding(
+                                    padding: EdgeInsets.only(
+                                        top: 10,
+                                        left: 10), // add padding to adjust icon
+                                    child: Icon(
+                                      Icons.phone_android,
+                                      color: cor,
+                                      size: 28,
+                                    ),
+                                  ),
                                 ),
                               ),
-                              EditableText(
-                                controller: setInputDataNome(name),
-                                focusNode: FocusNode(),
-                                style: TextStyle(
-                                    fontFamily: 'DancingScript',
-                                    fontSize: 40,
-                                    color: Colors.white),
-                                cursorColor: Colors.white,
-                                backgroundCursorColor: cor,
+                            ),
+                            SizedBox(
+                              height: 10.0,
+                            ),
+                            Form(
+                              // É AQUI --------------------------------
+                              child: TextField(
+                                onTap: () {
+                                  setState(() {
+                                    _profissao.clear();
+                                  });
+                                },
                                 textAlign: TextAlign.center,
-                                textCapitalization: TextCapitalization.words,
-                              ),
-                              SizedBox(
-                                height: 10.0,
-                              ),
-                              EditableText(
-                                controller: setInputDataProfissao(profissao),
-                                focusNode: FocusNode(),
+                                cursorColor: cor300,
                                 style: TextStyle(
+                                    color: cor300,
                                     fontFamily: 'Roboto',
                                     fontSize: 20,
-                                    color: cor300, //cores(300),
-                                    letterSpacing: 2.5,
-                                    fontWeight: FontWeight.bold),
-                                cursorColor: Colors.white,
-                                backgroundCursorColor: cor,
-                                textAlign: TextAlign.center,
+                                    letterSpacing: 2.5),
+                                controller: _profissao,
+                                textInputAction: TextInputAction.done,
+                                keyboardType: TextInputType.name,
                                 textCapitalization:
                                     TextCapitalization.characters,
-                              ),
-                              SizedBox(
-                                height: 20,
-                                width: 150,
-                                child: Divider(
-                                  color: cor300, //cores(300),
-                                  thickness: 1,
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  contentPadding: EdgeInsets.only(
+                                    right: 40,
+                                  ), // add padding to adjust text
+                                  isDense: true,
+                                  hintText: "Profissão",
+                                  hintStyle: TextStyle(color: Colors.black26),
+
+                                  prefixIcon: Padding(
+                                    padding: EdgeInsets.only(
+                                        top: 10,
+                                        left: 10), // add padding to adjust icon
+                                    child: Icon(
+                                      Icons.phone_android,
+                                      color: cor,
+                                      size: 28,
+                                    ),
+                                  ),
                                 ),
                               ),
-                              Card(
-                                  margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                                  color: Colors.white,
-                                  child: ListTile(
-                                    leading:
-                                        Icon(Icons.phone_android, color: cor),
-                                    title: EditableText(
-                                      controller:
-                                          setInputDataTelefone(telefone),
-                                      focusNode: FocusNode(),
-                                      style:
-                                          TextStyle(fontSize: 16, color: cor),
-                                      cursorColor: cor,
-                                      backgroundCursorColor: cor,
-                                      keyboardType: TextInputType.phone,
-                                    ),
-                                  )),
-                              Card(
-                                  margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                                  color: Colors.white,
-                                  child: ListTile(
-                                    leading:
-                                        Icon(Icons.alternate_email, color: cor),
-                                    title: EditableText(
-                                      controller: setInputDataEmail(email),
-                                      focusNode: FocusNode(),
-                                      style:
-                                          TextStyle(fontSize: 16, color: cor),
-                                      cursorColor: cor,
-                                      backgroundCursorColor: cor,
-                                      keyboardType: TextInputType.emailAddress,
-                                    ),
-                                  )),
-                              SizedBox(
-                                height: 15.0,
+                            ),
+                            SizedBox(
+                              height: 10,
+                              width: 150,
+                              child: Divider(
+                                color: cor300, //cores(300),
+                                thickness: 1,
                               ),
-                            ],
-                          ),
+                            ),
+                            Container(
+                              height: 77,
+                              child: Card(
+                                margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                                color: Colors.white,
+                                child: Form(
+                                  key: _formKey,
+                                  child: TextField(
+                                    onTap: () {
+                                      setState(() {
+                                        _telefone.clear();
+                                      });
+                                    },
+                                    textAlign: TextAlign.start,
+                                    inputFormatters: [maskTelCel],
+                                    cursorColor: cor300,
+                                    style: TextStyle(color: cor),
+                                    controller: _telefone,
+                                    textInputAction: TextInputAction.done,
+                                    keyboardType: TextInputType.phone,
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      contentPadding: EdgeInsets.only(
+                                          top: 20,
+                                          right:
+                                              140), // add padding to adjust text
+                                      isDense: true,
+                                      hintText: "Telefone",
+
+                                      prefixIcon: Padding(
+                                        padding: EdgeInsets.only(
+                                            top: 10,
+                                            left: 10,
+                                            right:
+                                                10), // add padding to adjust icon
+                                        child: Icon(
+                                          Icons.phone_android,
+                                          color: cor,
+                                          size: 28,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Container(
+                              height: 77,
+                              child: Card(
+                                margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                                color: Colors.white,
+                                child: TextField(
+                                  onTap: () {
+                                    setState(() {
+                                      _email.clear();
+                                    });
+                                  },
+                                  textAlign: TextAlign.start,
+                                  //inputFormatters: [maskTelCel],
+                                  cursorColor: cor300,
+                                  style: TextStyle(color: cor),
+                                  controller: _email,
+                                  textInputAction: TextInputAction.done,
+                                  keyboardType: TextInputType.emailAddress,
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.only(
+                                        top: 20,
+                                        left: 30), // add padding to adjust text
+                                    isDense: true,
+                                    hintText: "Email",
+
+                                    prefixIcon: Padding(
+                                      padding: EdgeInsets.only(
+                                          top: 10,
+                                          left: 10,
+                                          right:
+                                              10), // add padding to adjust icon
+                                      child: Icon(
+                                        Icons.alternate_email,
+                                        color: cor,
+                                        size: 28,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            SizedBox(
+                              height: 15.0,
+                            ),
+                          ],
                         ),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: FloatingActionButton(
-                              child: Icon(Icons.add),
-                              onPressed: newData,
-                            ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: FloatingActionButton(
+                            child: Icon(Icons.add),
+                            onPressed: newData,
                           ),
-                          Align(
-                            alignment: Alignment.center,
-                            child: FloatingActionButton(
-                              child: Icon(Icons.color_lens),
-                              onPressed: cores,
-                            ),
+                        ),
+                        Align(
+                          alignment: Alignment.center,
+                          child: FloatingActionButton(
+                            child: Icon(Icons.color_lens),
+                            onPressed: cores,
                           ),
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: FloatingActionButton(
-                              child: Icon(Icons.share),
-                              onPressed: _takeScreenshot,
-                            ),
+                        ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: FloatingActionButton(
+                            child: Icon(Icons.share),
+                            onPressed: _takeScreenshot,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    if (banner == null)
                       SizedBox(
-                        height: 20,
-                      ),
-                      if (banner == null)
-                        SizedBox(
-                          height: 50,
-                        )
-                      else
-                        Container(height: 50, child: AdWidget(ad: banner)),
-                    ],
-                  ),
+                        height: 50,
+                      )
+                    else
+                      Container(height: 50, child: AdWidget(ad: banner)),
+                  ],
                 ),
               ),
-            )));
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
